@@ -1,5 +1,22 @@
 import { Exercise } from '@/types/database';
 
+export const EXERCISE_IMAGES: { [key: string]: string } = {
+  'Chest Press Machine': '/exercises/chest-press.jpg',
+  'Lat Pulldown Machine': '/exercises/lat-pulldown.jpg',
+  'Dumbbell Shoulder Press': '/exercises/shoulder-press.jpg',
+  'Leg Press Machine': '/exercises/leg-press.jpg',
+  'Dumbbell Bicep Curl': '/exercises/bicep-curl.jpg',
+  'Seated Cable Row': '/exercises/cable-row.jpg',
+  'Incline Press (Dumbbell/Machine)': '/exercises/incline-press.jpg',
+  'Dumbbell Lateral Raise': '/exercises/lateral-raise.jpg',
+  'Leg Curl Machine': '/exercises/leg-curl.jpg',
+  'Rope Tricep Pushdown': '/exercises/tricep-pushdown.jpg',
+};
+
+export function getExerciseImage(name: string): string {
+  return EXERCISE_IMAGES[name] || '/exercises/chest-press.jpg';
+}
+
 export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
   // Sesi A
   {
@@ -9,6 +26,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Duduk tegak, dorong pegangan ke depan sejajar dada.',
+    image_url: '/exercises/chest-press.jpg',
     order_index: 1,
   },
   {
@@ -18,6 +36,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Tarik palang ke dada atas, busungkan dada.',
+    image_url: '/exercises/lat-pulldown.jpg',
     order_index: 2,
   },
   {
@@ -27,6 +46,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Duduk senderan, dorong dumbbell lurus ke atas.',
+    image_url: '/exercises/shoulder-press.jpg',
     order_index: 3,
   },
   {
@@ -36,6 +56,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Kaki selebar bahu, dorong tanpa lock lutut kaku.',
+    image_url: '/exercises/leg-press.jpg',
     order_index: 4,
   },
   {
@@ -45,6 +66,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '12',
     tips: 'Siku diam di samping badan, tekuk lengan ke atas.',
+    image_url: '/exercises/bicep-curl.jpg',
     order_index: 5,
   },
 
@@ -56,6 +78,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Duduk tegak, tarik pegangan ke arah perut bawah/pusar.',
+    image_url: '/exercises/cable-row.jpg',
     order_index: 1,
   },
   {
@@ -65,6 +88,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Bangku miring 30-45 derajat, dorong ke atas.',
+    image_url: '/exercises/incline-press.jpg',
     order_index: 2,
   },
   {
@@ -74,6 +98,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '12-15',
     tips: 'Beban ringan (2-4 kg), angkat ke samping setinggi bahu.',
+    image_url: '/exercises/lateral-raise.jpg',
     order_index: 3,
   },
   {
@@ -83,6 +108,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '10-12',
     tips: 'Mesin tekuk kaki posisi duduk atau tengkurap.',
+    image_url: '/exercises/leg-curl.jpg',
     order_index: 4,
   },
   {
@@ -92,6 +118,7 @@ export const DEFAULT_EXERCISES: Omit<Exercise, 'id'>[] = [
     default_sets: 3,
     target_reps: '12',
     tips: 'Tarik tali ke bawah, rentangkan ujung tali di akhir.',
+    image_url: '/exercises/tricep-pushdown.jpg',
     order_index: 5,
   },
 ];

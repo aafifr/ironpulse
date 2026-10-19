@@ -8,6 +8,7 @@ export interface Exercise {
   default_sets: number;
   target_reps: string;
   tips: string | null;
+  image_url?: string;
   order_index: number;
 }
 

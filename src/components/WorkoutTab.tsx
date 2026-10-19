@@ -4,11 +4,12 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import { Play, Check, RotateCcw, History } from 'lucide-react';
 import { Exercise, SessionType, ExerciseSetItem, SavedWorkoutSession } from '@/types/database';
-import { DEFAULT_EXERCISES } from '@/lib/defaultExercises';
+import { DEFAULT_EXERCISES, getExerciseImage } from '@/lib/defaultExercises';
 import { formatIndonesianDate, getTodaySchedule } from '@/lib/schedule';
 import { playShortClickSound } from '@/lib/audio';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { WorkoutHistoryModal } from '@/components/WorkoutHistoryModal';
+import { ExerciseDetailModal } from '@/components/ExerciseDetailModal';
 
 interface WorkoutTabProps {
   onStartRestTimer: (seconds?: number) => void;
@@ -46,7 +47,6 @@ export function WorkoutTab({
   // Exercises & Set Logs
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [setLogsState, setSetLogsState] = useState<{ [exerciseId: string]: ExerciseSetItem[] }>({});
-  const [expandedTips, setExpandedTips] = useState<{ [key: string]: boolean }>({});
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(null);
 
   // Modals & History
@@ -62,6 +62,7 @@ export function WorkoutTab({
   });
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
   const [workoutHistory, setWorkoutHistory] = useState<SavedWorkoutSession[]>([]);
+  const [selectedExerciseForModal, setSelectedExerciseForModal] = useState<Exercise | null>(null);
 
   const previousHints: { [exerciseName: string]: string } = {
     'Chest Press Machine': '25 kg × 10',
@@ -636,39 +637,56 @@ export function WorkoutTab({
 
             {exercises.map((exercise, index) => {
               const hint = getPreviousExerciseHint(exercise.name);
+              const imgUrl = exercise.image_url || getExerciseImage(exercise.name);
               return (
                 <div
                   key={exercise.id}
-                  className="bg-white rounded-2xl p-4 border border-stone-200/70 shadow-sm flex items-start justify-between gap-3"
+                  className="bg-white rounded-2xl p-3 border border-stone-200/70 shadow-sm flex items-center justify-between gap-3"
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-medium text-[#86868B]">
-                        0{index + 1}
-                      </span>
-                      <h4 className="text-xs font-semibold text-[#1D1D1F]">
-                        {exercise.name}
-                      </h4>
-                    </div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <button
+                      onClick={() => setSelectedExerciseForModal(exercise)}
+                      className="relative w-14 h-14 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200/80 group active:scale-95 transition-all shadow-sm"
+                      title="Klik untuk panduan postur gerakan"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgUrl}
+                        alt={exercise.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    </button>
 
-                    <div className="text-[11px] text-[#86868B] space-y-0.5">
-                      <div>
-                        Otot: <span className="text-stone-700 font-medium">{exercise.target_muscle}</span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-mono font-medium text-[#86868B]">
+                          0{index + 1}
+                        </span>
+                        <h4 className="text-xs font-semibold text-[#1D1D1F] truncate">
+                          {exercise.name}
+                        </h4>
                       </div>
-                      <div>
-                        Target: <span className="text-stone-700 font-medium">{exercise.target_reps} reps (3 set)</span>
+
+                      <div className="text-[11px] text-[#86868B] space-y-0.5 mt-0.5">
+                        <p className="truncate">
+                          <span className="text-stone-700 font-medium">{exercise.target_muscle}</span> • {exercise.target_reps} reps
+                        </p>
+                        {hint && (
+                          <p className="text-[#8F6B27] font-mono font-medium truncate">
+                            Sesi lalu: <span>{hint}</span>
+                          </p>
+                        )}
                       </div>
-                      {hint && (
-                        <div className="text-[#8F6B27] font-mono font-medium pt-0.5">
-                          Sesi lalu: <span>{hint}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono bg-stone-100 text-[#86868B] px-2 py-1 rounded-lg flex-shrink-0">
+                  <button
+                    onClick={() => setSelectedExerciseForModal(exercise)}
+                    className="text-[10px] font-mono bg-stone-100 hover:bg-stone-200/70 text-[#86868B] hover:text-[#1D1D1F] px-2.5 py-1.5 rounded-lg flex-shrink-0 transition-colors font-medium"
+                    title="Lihat panduan postur"
+                  >
                     3 Set
-                  </span>
+                  </button>
                 </div>
               );
             })}
@@ -707,57 +725,52 @@ export function WorkoutTab({
                   className="bg-white rounded-2xl p-4 border border-stone-200/70 shadow-sm space-y-3"
                 >
                   {/* Exercise Header */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono font-medium text-[#86868B]">
-                          0{index + 1}
-                        </span>
-                        <h4 className="text-sm font-semibold text-[#1D1D1F]">
-                          {exercise.name}
-                        </h4>
-                      </div>
-                      <div className="mt-2 space-y-0.5 text-[11px]">
-                        <div className="text-[#86868B]">
-                          Otot: <span className="text-stone-700 font-medium">{exercise.target_muscle}</span>
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <button
+                        onClick={() => setSelectedExerciseForModal(exercise)}
+                        className="relative w-11 h-11 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200/80 active:scale-95 transition-all group shadow-sm"
+                        title="Klik untuk panduan gerakan"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={exercise.image_url || getExerciseImage(exercise.name)}
+                          alt={exercise.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </button>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-mono font-medium text-[#86868B]">
+                            0{index + 1}
+                          </span>
+                          <h4 className="text-sm font-semibold text-[#1D1D1F] truncate">
+                            {exercise.name}
+                          </h4>
                         </div>
-                        <div className="text-[#86868B]">
-                          Target: <span className="text-stone-700 font-medium">{exercise.target_reps} reps</span>
+                        <div className="mt-0.5 space-y-0.5 text-[11px]">
+                          <p className="text-[#86868B] truncate">
+                            Otot: <span className="text-stone-700 font-medium">{exercise.target_muscle}</span> • {exercise.target_reps} reps
+                          </p>
+                          {hint && (
+                            <p className="text-[#8F6B27] font-mono font-medium truncate">
+                              Sesi lalu: <span>{hint}</span>
+                            </p>
+                          )}
                         </div>
-                        {hint && (
-                          <div className="text-[#8F6B27] font-mono font-medium pt-0.5">
-                            Sesi lalu: <span>{hint}</span>
-                          </div>
-                        )}
                       </div>
                     </div>
 
-                    {exercise.tips && (
-                      <button
-                        onClick={() =>
-                          setExpandedTips((prev) => ({
-                            ...prev,
-                            [exercise.id]: !prev[exercise.id],
-                          }))
-                        }
-                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-serif italic transition-all ${
-                          expandedTips[exercise.id]
-                            ? 'bg-[#FAF4E6] text-[#8F6B27] border border-[#E8D4A8]/80'
-                            : 'text-stone-400 hover:text-stone-700 hover:bg-stone-100 border border-stone-200'
-                        }`}
-                        title="Panduan form gerakan"
-                      >
-                        i
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setSelectedExerciseForModal(exercise)}
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 border border-stone-200 text-[11px] font-serif italic transition-all flex-shrink-0 mt-0.5"
+                      title="Panduan form gerakan"
+                    >
+                      i
+                    </button>
                   </div>
 
-                  {/* Expandable Tips */}
-                  {expandedTips[exercise.id] && exercise.tips && (
-                    <div className="text-[11px] text-[#8F6B27] bg-[#FAF8F5] p-2.5 rounded-xl border border-[#E8D4A8]/60 leading-relaxed">
-                      <span className="font-semibold text-[#8F6B27]">Panduan form:</span> {exercise.tips}
-                    </div>
-                  )}
 
                   {/* Sets Rows Table */}
                   <div className="space-y-1.5 pt-1">
@@ -928,6 +941,12 @@ export function WorkoutTab({
           setWorkoutHistory(updated);
           localStorage.setItem('ironpulse_workout_history', JSON.stringify(updated));
         }}
+      />
+
+      {/* Exercise Detail Visual Modal */}
+      <ExerciseDetailModal
+        exercise={selectedExerciseForModal}
+        onClose={() => setSelectedExerciseForModal(null)}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Play, Flame, Utensils, TrendingUp, Dumbbell, ArrowRight } from 'lucide-react';
 import { getCurrentWeekDays, formatIndonesianDate } from '@/lib/schedule';
 import { SavedWorkoutSession, SessionType } from '@/types/database';
+import { DEFAULT_EXERCISES, getExerciseImage } from '@/lib/defaultExercises';
 import { playShortClickSound } from '@/lib/audio';
 
 interface HomeTabProps {
@@ -170,6 +171,33 @@ export function HomeTab({
             </p>
           </div>
         </div>
+
+        {/* Exercise Visual Thumbnails Preview */}
+        {selectedDay.sessionType && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5">
+            {DEFAULT_EXERCISES.filter((ex) => ex.session_type === selectedDay.sessionType).map((ex, i) => (
+              <div
+                key={i}
+                className="flex-shrink-0 flex items-center gap-2 bg-stone-50 p-1.5 pr-2.5 rounded-xl border border-stone-200/60"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ex.image_url || getExerciseImage(ex.name)}
+                  alt={ex.name}
+                  className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+                />
+                <div className="text-left">
+                  <p className="text-[10px] font-semibold text-[#1D1D1F] max-w-[95px] truncate">
+                    {ex.name}
+                  </p>
+                  <p className="text-[9px] text-[#86868B] max-w-[95px] truncate">
+                    {ex.target_muscle}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Action Button */}
         <button
