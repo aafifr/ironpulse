@@ -391,21 +391,17 @@ export function WorkoutTab({ onStartRestTimer }: WorkoutTabProps) {
                           {exercise.name}
                         </h4>
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] text-[#86868B]">
-                          {exercise.target_muscle}
-                        </span>
-                        <span className="text-stone-300">•</span>
-                        <span className="text-[11px] text-[#86868B]">
-                          Target {exercise.target_reps} reps
-                        </span>
+                      <div className="mt-2 space-y-0.5 text-[11px]">
+                        <div className="text-[#86868B]">
+                          Otot: <span className="text-stone-700 font-medium">{exercise.target_muscle}</span>
+                        </div>
+                        <div className="text-[#86868B]">
+                          Target: <span className="text-stone-700 font-medium">{exercise.target_reps} reps</span>
+                        </div>
                         {hint && (
-                          <>
-                            <span className="text-stone-300">•</span>
-                            <span className="text-[11px] text-[#8F6B27] font-mono">
-                              Lalu: {hint}
-                            </span>
-                          </>
+                          <div className="text-[#8F6B27] font-mono font-medium pt-0.5">
+                            Sesi lalu: <span>{hint}</span>
+                          </div>
                         )}
                       </div>
                     </div>
