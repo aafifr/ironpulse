@@ -14,16 +14,24 @@ export function Header({ isOnline, onOpenSettings }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 w-full bg-[#F8F9FA]/90 backdrop-blur-xl border-b border-stone-200/60 px-5 py-3.5">
       <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold tracking-tight text-[#1D1D1F]">
-              IronPulse
-            </span>
-            <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[#FAF4E6] text-[#8F6B27] border border-[#E8D4A8]/60">
-              Bulk
-            </span>
+        <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/IMG_4115.webp"
+            alt="Foto profil"
+            className="w-10 h-10 rounded-full object-cover border border-[#E8D4A8] shadow-sm flex-shrink-0"
+          />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold tracking-tight text-[#1D1D1F]">
+                IronPulse
+              </span>
+              <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[#FAF4E6] text-[#8F6B27] border border-[#E8D4A8]/60">
+                Bulk
+              </span>
+            </div>
+            <p className="text-[11px] text-[#86868B] font-normal mt-0.5">{dateFormatted}</p>
           </div>
-          <p className="text-[11px] text-[#86868B] font-normal mt-0.5">{dateFormatted}</p>
         </div>
 
         <button

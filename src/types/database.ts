@@ -56,3 +56,18 @@ export interface ExerciseSetItem {
   is_completed: boolean;
   db_id?: string;
 }
+
+export interface SavedWorkoutSession {
+  id: string;
+  date: string;
+  session_type: SessionType;
+  duration_seconds?: number;
+  total_sets: number;
+  total_volume_kg: number;
+  exercises_summary: {
+    name: string;
+    target_muscle: string;
+    sets: { set_number: number; weight_kg: number; reps_completed: number }[];
+  }[];
+  created_at: string;
+}

@@ -27,7 +27,7 @@ export function RestTimerBar({
   const isFinished = secondsLeft === 0;
 
   return (
-    <div className="fixed bottom-20 left-0 right-0 z-30 max-w-md mx-auto px-5 animate-in slide-in-from-bottom duration-200">
+    <div className="fixed bottom-[88px] left-0 right-0 z-30 max-w-md mx-auto px-5 animate-in slide-in-from-bottom duration-200">
       <div className="bg-[#1D1D1F] text-white rounded-2xl p-3.5 shadow-[0_12px_32px_rgba(0,0,0,0.2)] border border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2.5">

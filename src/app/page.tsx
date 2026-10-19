@@ -3,17 +3,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Navbar, TabType } from '@/components/Navbar';
+import { HomeTab } from '@/components/HomeTab';
 import { WorkoutTab } from '@/components/WorkoutTab';
 import { NutritionTab } from '@/components/NutritionTab';
 import { ProgressTab } from '@/components/ProgressTab';
+import { HistoryTab } from '@/components/HistoryTab';
 import { RestTimerBar } from '@/components/RestTimerBar';
 import { ConfigModal } from '@/components/ConfigModal';
 import { playRestTimerDoneSound } from '@/lib/audio';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { SessionType } from '@/types/database';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<TabType>('workout');
+  const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
+  const [isWorkoutActive, setIsWorkoutActive] = useState<boolean>(false);
+  const [selectedSession, setSelectedSession] = useState<SessionType>('A');
 
   // Rest Timer State
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
@@ -21,6 +26,21 @@ export default function Home() {
   const [totalRestDuration, setTotalRestDuration] = useState<number>(90);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Check if workout is active from localStorage on mount
+  useEffect(() => {
+    const savedActive = localStorage.getItem('ironpulse_active_workout');
+    if (savedActive) {
+      try {
+        const parsed = JSON.parse(savedActive);
+        if (parsed.isWorkoutActive) {
+          setIsWorkoutActive(true);
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
 
   // Start rest timer function (called by WorkoutTab when set is completed)
   function handleStartRestTimer(seconds = 90) {
@@ -78,13 +98,34 @@ export default function Home() {
 
         {/* Main Tab Content Area */}
         <main className="flex-1 px-4 pt-2">
-          {activeTab === 'workout' && (
-            <WorkoutTab onStartRestTimer={handleStartRestTimer} />
+          {activeTab === 'home' && (
+            <HomeTab
+              onNavigateToWorkout={(session) => {
+                if (session) setSelectedSession(session);
+                setActiveTab('workout');
+              }}
+              onNavigateToNutrition={() => setActiveTab('nutrition')}
+              onNavigateToProgress={() => setActiveTab('progress')}
+              onNavigateToHistory={() => setActiveTab('history')}
+            />
           )}
 
           {activeTab === 'nutrition' && <NutritionTab />}
 
+          {activeTab === 'workout' && (
+            <WorkoutTab
+              onStartRestTimer={handleStartRestTimer}
+              onWorkoutStateChange={setIsWorkoutActive}
+              onNavigateToHistory={() => setActiveTab('history')}
+              selectedSession={selectedSession}
+            />
+          )}
+
           {activeTab === 'progress' && <ProgressTab />}
+
+          {activeTab === 'history' && (
+            <HistoryTab onStartNewWorkout={() => setActiveTab('workout')} />
+          )}
         </main>
 
         {/* Floating Rest Timer (Floats above bottom dock) */}
@@ -96,8 +137,12 @@ export default function Home() {
           onSkip={handleSkipTimer}
         />
 
-        {/* Fixed Bottom Dock Navigation */}
-        <Navbar activeTab={activeTab} onChangeTab={setActiveTab} />
+        {/* Fixed Bottom Dock Navigation with Center Elevated Button */}
+        <Navbar
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+          isWorkoutActive={isWorkoutActive}
+        />
 
         {/* Supabase Connection Setup Modal */}
         <ConfigModal

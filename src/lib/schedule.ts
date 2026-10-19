@@ -88,3 +88,49 @@ export function getTodaySchedule(customDayIndex?: number): DaySchedule {
       };
   }
 }
+
+export interface WeekDayItem {
+  date: Date;
+  dateString: string; // YYYY-MM-DD
+  dayNum: number;
+  dayShort: string; // Sen, Sel, Rab, Kam, Jum, Sab, Min
+  isToday: boolean;
+  dayIndex: number;
+  sessionType: SessionType | null;
+}
+
+export function getCurrentWeekDays(baseDate = new Date()): WeekDayItem[] {
+  const current = new Date(baseDate);
+  const day = current.getDay();
+  const diffToMonday = (day === 0 ? -6 : 1) - day;
+  const monday = new Date(current);
+  monday.setDate(current.getDate() + diffToMonday);
+
+  const daysShort = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  const todayStr = getTodayDateString();
+
+  return Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const dayDate = String(d.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${dayDate}`;
+    const dayIdx = d.getDay();
+
+    let sessionType: SessionType | null = null;
+    if (dayIdx === 1 || dayIdx === 5) sessionType = 'A';
+    if (dayIdx === 3) sessionType = 'B';
+
+    return {
+      date: d,
+      dateString,
+      dayNum: d.getDate(),
+      dayShort: daysShort[dayIdx],
+      isToday: dateString === todayStr,
+      dayIndex: dayIdx,
+      sessionType,
+    };
+  });
+}
