@@ -1,0 +1,16 @@
+{
+  "name": "IronPulse",
+  "short_name": "IronPulse",
+  "description": "Personal Gym & Bulking Companion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#060913",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
